@@ -1,58 +1,60 @@
 # CopilotBridge
 
-A shared LiteLLM proxy that lets your team use GitHub Copilot models (Claude, GPT, Gemini) through a single OpenAI-compatible API endpoint — no per-machine Docker or browser auth needed.
+[English](README_EN.md)
 
-## Quick Deploy on Railway
+一个共享的 LiteLLM 代理，让团队通过单一的 OpenAI 兼容 API 端点使用 GitHub Copilot 模型（Claude、GPT、Gemini）——无需每台机器单独安装 Docker 或浏览器认证。
 
-### 1. Fork & Deploy
+## 一键部署到 Railway
 
-1. **Fork** this repo to your GitHub account
-2. Go to [railway.com](https://railway.com/) and sign in with your GitHub account
-3. If prompted, **Install the Railway GitHub App** to grant access to your repos
-4. **New Project** → **Deploy from GitHub Repo** → select your forked `CopilotBridge` repo
-5. Railway will start building automatically
+### 1. Fork 并部署
 
-### 2. Configure
+1. **Fork** 本仓库到你的 GitHub 账号
+2. 打开 [railway.com](https://railway.com/)，使用 GitHub 账号登录
+3. 如果提示，点击 **Install Railway GitHub App** 授权访问你的仓库
+4. **New Project** → **Deploy from GitHub Repo** → 选择你 fork 的 `CopilotBridge` 仓库
+5. Railway 会自动开始构建
 
-After the first deploy (it will show the Auth Wizard), configure these in Railway:
+### 2. 配置
 
-**Variables** (service → Variables tab → New Variable):
+首次部署完成后（会显示认证向导页面），在 Railway 中配置以下内容：
 
-| Variable | Value |
+**环境变量**（服务 → Variables 标签 → New Variable）：
+
+| 变量 | 值 |
 |---|---|
-| `LITELLM_MASTER_KEY` | A secret key of your choice, e.g. `sk-my-secret-key-123` |
+| `LITELLM_MASTER_KEY` | 你自定义的密钥，例如 `sk-my-secret-key-123` |
 | `RAILWAY_RUN_UID` | `0` |
 
-> ⚠️ If you skip `LITELLM_MASTER_KEY`, the proxy runs without authentication — anyone can use it.
+> ⚠️ 如果不设置 `LITELLM_MASTER_KEY`，代理将无需认证即可访问——任何人都能调用。
 
-**Networking** (service → Settings tab → Networking):
+**网络配置**（服务 → Settings 标签 → Networking）：
 
-- Under **Public Networking**, click **Generate Domain**
-- You'll get a URL like `https://your-app-production.up.railway.app`
+- 在 **Public Networking** 下，点击 **Generate Domain**
+- 你会得到一个类似 `https://your-app-production.up.railway.app` 的 URL
 
-**Dockerfile Path** (service → Settings tab → Build):
+**Dockerfile 路径**（服务 → Settings 标签 → Build）：
 
-- Set **Custom Dockerfile Path** to `railway/Dockerfile`
+- 将 **Custom Dockerfile Path** 设置为 `railway/Dockerfile`
 
-### 3. Authenticate with GitHub Copilot
+### 3. GitHub Copilot 认证
 
-1. Open your Railway domain URL in a browser
-2. You'll see the **CopilotBridge Auth Wizard**
-3. Click **Begin Authentication**
-4. A device code appears — click **Open GitHub** and enter the code
-5. Authorize in GitHub (takes ~10 seconds)
-6. The proxy automatically restarts into API mode
+1. 在浏览器中打开你的 Railway 域名 URL
+2. 你会看到 **CopilotBridge 认证向导**
+3. 点击 **Begin Authentication**（开始认证）
+4. 页面显示设备代码 —— 点击 **Open GitHub** 并输入代码
+5. 在 GitHub 页面授权（约 10 秒）
+6. 代理自动重启进入 API 模式
 
-### 4. Use the Proxy
+### 4. 使用代理
 
 ```bash
 curl https://your-app.up.railway.app/v1/chat/completions \
   -H "Authorization: Bearer YOUR_MASTER_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "Hello!"}]}'
+  -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "你好！"}]}'
 ```
 
-**For Claude Code users:**
+**Claude Code 用户配置：**
 
 ```bash
 export ANTHROPIC_BASE_URL="https://your-app.up.railway.app"
@@ -60,46 +62,46 @@ export ANTHROPIC_AUTH_TOKEN="YOUR_MASTER_KEY"
 export ANTHROPIC_API_KEY="YOUR_MASTER_KEY"
 ```
 
-### Available Models
+### 可用模型
 
-| Provider | Models |
-|----------|--------|
+| 提供商 | 模型 |
+|--------|------|
 | **Anthropic** | claude-sonnet-4, claude-sonnet-4.5, claude-sonnet-4.6, claude-opus-4.5, claude-opus-4.6, claude-opus-4.6-1m, claude-haiku-4.5 |
 | **OpenAI** | gpt-4o, gpt-4.1, gpt-5-mini, gpt-5.1, gpt-5.2, gpt-5.4 |
 | **Google** | gemini-2.5-pro, gemini-3-flash-preview, gemini-3.1-pro-preview |
-| **Other** | minimax-m2.5 |
+| **其他** | minimax-m2.5 |
 
-### Re-authentication
+### 重新认证
 
-If the GitHub OAuth token expires, the container will crash and restart into the Auth Wizard automatically. Just visit the URL again and complete the flow.
+如果 GitHub OAuth 令牌过期，容器会自动崩溃并重启进入认证向导。再次访问 URL 完成认证即可。
 
-To manually trigger re-auth, call:
+手动触发重新认证：
 
 ```bash
 curl -X POST https://your-app.up.railway.app/auth/reset \
   -H "Authorization: Bearer YOUR_MASTER_KEY"
 ```
 
-> **Tip:** Attach a [Railway Volume](https://docs.railway.com/guides/volumes) mounted at `/root/.config` to persist OAuth credentials across redeploys.
+> **提示：** 挂载 [Railway Volume](https://docs.railway.com/guides/volumes)（路径 `/root/.config`）可以在重新部署后保留 OAuth 凭据。
 
 ---
 
-## Azure Deployment
+## Azure 部署
 
-For Azure Container Apps deployment, see [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) and the `scripts/` directory.
+如需部署到 Azure Container Apps，请参阅 [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) 和 `scripts/` 目录。
 
-## Architecture
+## 架构
 
 ```
-User / CI/CD
+用户 / CI/CD
     │
     ▼
 ┌─────────────────────────┐
-│  CopilotBridge Proxy    │
+│  CopilotBridge 代理     │
 │  (LiteLLM on Railway)   │
 │  LITELLM_MASTER_KEY     │
 └────────────┬────────────┘
-             │ GitHub OAuth token
+             │ GitHub OAuth 令牌
              ▼
 ┌─────────────────────────┐
 │  GitHub Copilot API     │
@@ -107,11 +109,11 @@ User / CI/CD
 └─────────────────────────┘
 ```
 
-The proxy uses a three-layer token system:
-- **Layer 1** — GitHub OAuth access token (long-lived, from Device Code Flow)
-- **Layer 2** — Copilot API key (short-lived, auto-refreshed by LiteLLM every ~30 min)
-- **Layer 3** — `LITELLM_MASTER_KEY` (your proxy access key, shared with clients)
+代理使用三层令牌机制：
+- **第一层** — GitHub OAuth 访问令牌（长期有效，通过设备代码流获取）
+- **第二层** — Copilot API 密钥（短期有效，LiteLLM 每 ~30 分钟自动刷新）
+- **第三层** — `LITELLM_MASTER_KEY`（代理访问密钥，分享给客户端使用）
 
-## License
+## 许可证
 
 MIT
