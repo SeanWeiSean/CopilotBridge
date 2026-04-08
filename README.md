@@ -92,42 +92,22 @@ curl http://localhost:4000/v1/chat/completions \
 
 Railway 有 **$5 免费额度**，供体验约一个月。无需安装任何本地工具。
 
-### 1. Fork 并部署
+### 1. 一键部署
 
-1. **Fork** 本仓库到你的 GitHub 账号
-2. 打开 [railway.com](https://railway.com/)，使用 GitHub 账号登录
-3. 如果提示，点击 **Install Railway GitHub App** 授权访问你的仓库
-4. **New Project** → **Deploy from GitHub Repo** → 选择你 fork 的 `CopilotBridge` 仓库
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/A1hy6O?referralCode=gCb16U)
 
-### 2. 配置
+点击按钮后：
+1. 使用 GitHub 账号登录 Railway
+2. 确认 `LITELLM_MASTER_KEY`（模板会自动生成随机密钥，也可自定义）
+3. 点击 **Deploy** 等待部署完成（Volume、网络等均已自动配置）
 
-**环境变量**（服务 → Variables 标签 → New Variable）：
+> **记下你的 `LITELLM_MASTER_KEY`**，后续客户端配置需要用到。
 
-| 变量 | 值 |
-|---|---|
-| `LITELLM_MASTER_KEY` | 一个高强度密钥（至少 32 位随机字符） |
-| `RAILWAY_RUN_UID` | `0` |
+### 2. GitHub Copilot 认证
 
-生成密钥：
-```bash
-echo "sk-$(openssl rand -hex 16)"
-```
+部署完成后，访问你的 Railway 域名 → 点击 **Begin Authentication** → 输入设备代码 → 授权（~10 秒）→ 代理自动进入 API 模式。
 
-> **🚨 强烈建议设置 `LITELLM_MASTER_KEY`！** 不设则代理完全开放，互联网上任何人都可调用，可能导致**严重的资金损失和账号风险**。
-
-**网络配置**（服务 → Settings → Networking → **Generate Domain**）
-
-**Dockerfile 路径**（服务 → Settings → Build → Custom Dockerfile Path → `railway/Dockerfile`）
-
-**关闭自动部署**（服务 → Settings → Source → **Disconnect**）
-- 防止 push 代码时自动重新部署导致 OAuth 凭据丢失
-- 手动部署：`Cmd+K` → "Deploy Latest Commit"
-
-### 3. GitHub Copilot 认证
-
-访问你的 Railway 域名 → 点击 **Begin Authentication** → 输入设备代码 → 授权（~10 秒）→ 代理自动进入 API 模式。
-
-### 4. 使用
+### 3. 使用
 
 ```bash
 curl https://your-app.up.railway.app/v1/chat/completions \

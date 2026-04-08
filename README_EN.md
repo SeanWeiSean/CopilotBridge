@@ -79,35 +79,22 @@ curl http://localhost:4000/v1/chat/completions \
 
 Railway offers a **$5 free trial** (~1 month). No local tools needed.
 
-### 1. Fork & Deploy
+### 1. One-Click Deploy
 
-1. **Fork** this repo to your GitHub account
-2. Go to [railway.com](https://railway.com/) and sign in with GitHub
-3. If prompted, **Install the Railway GitHub App**
-4. **New Project** → **Deploy from GitHub Repo** → select `CopilotBridge`
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/A1hy6O?referralCode=gCb16U)
 
-### 2. Configure
+After clicking the button:
+1. Sign in to Railway with your GitHub account
+2. Confirm `LITELLM_MASTER_KEY` (a random key is auto-generated, or customize your own)
+3. Click **Deploy** and wait for it to finish (Volume, networking, etc. are pre-configured)
 
-**Variables** (service → Variables → New Variable):
+> **Save your `LITELLM_MASTER_KEY`** — you'll need it for client configuration.
 
-| Variable | Value |
-|---|---|
-| `LITELLM_MASTER_KEY` | A strong key (32+ random chars): `echo "sk-$(openssl rand -hex 16)"` |
-| `RAILWAY_RUN_UID` | `0` |
+### 2. Authenticate
 
-> **🚨 You MUST set `LITELLM_MASTER_KEY`!** Without it, anyone can call AI models through your proxy — **significant financial loss and account risk**.
+Once deployed, visit your Railway URL → **Begin Authentication** → enter device code → authorize (~10 sec) → proxy is live.
 
-**Networking** (Settings → Networking → **Generate Domain**)
-
-**Dockerfile Path** (Settings → Build → `railway/Dockerfile`)
-
-**Disable Auto-deploy** (Settings → Source → **Disconnect**)
-
-### 3. Authenticate
-
-Visit your Railway URL → **Begin Authentication** → enter device code → authorize (~10 sec) → proxy is live.
-
-### 4. Use It
+### 3. Use It
 
 ```bash
 curl https://your-app.up.railway.app/v1/chat/completions \
