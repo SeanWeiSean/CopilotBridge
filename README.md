@@ -22,10 +22,18 @@
 
 | 变量 | 值 |
 |---|---|
-| `LITELLM_MASTER_KEY` | 你自定义的密钥，例如 `sk-my-secret-key-123` |
+| `LITELLM_MASTER_KEY` | 一个高强度密钥（至少 32 位随机字符）。可用密码生成器生成，例如：`sk-` + 随机 32 位十六进制字符串 |
 | `RAILWAY_RUN_UID` | `0` |
 
-> ⚠️ 如果不设置 `LITELLM_MASTER_KEY`，代理将无需认证即可访问——任何人都能调用。
+生成密钥示例（在终端运行）：
+```bash
+# Linux / macOS
+echo "sk-$(openssl rand -hex 16)"
+# PowerShell
+"sk-" + -join ((1..32) | ForEach-Object { '{0:x}' -f (Get-Random -Max 16) })
+```
+
+> **🚨 强烈建议设置 `LITELLM_MASTER_KEY`！** 如果不设置此密钥，代理将完全开放——互联网上任何人都可以通过你的代理调用 AI 模型，消耗你的 GitHub Copilot 配额，可能导致**严重的资金损失和账号风险**。
 
 **网络配置**（服务 → Settings 标签 → Networking）：
 

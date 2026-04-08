@@ -22,10 +22,18 @@ After the first deploy (it will show the Auth Wizard), configure these in Railwa
 
 | Variable | Value |
 |---|---|
-| `LITELLM_MASTER_KEY` | A secret key of your choice, e.g. `sk-my-secret-key-123` |
+| `LITELLM_MASTER_KEY` | A strong secret key (at least 32 random characters). Use a password generator, e.g. `sk-` + 32 random hex characters |
 | `RAILWAY_RUN_UID` | `0` |
 
-> ⚠️ If you skip `LITELLM_MASTER_KEY`, the proxy runs without authentication — anyone can use it.
+Generate a key (run in terminal):
+```bash
+# Linux / macOS
+echo "sk-$(openssl rand -hex 16)"
+# PowerShell
+"sk-" + -join ((1..32) | ForEach-Object { '{0:x}' -f (Get-Random -Max 16) })
+```
+
+> **🚨 You MUST set `LITELLM_MASTER_KEY`!** Without it, the proxy is completely open — anyone on the internet can call AI models through your proxy, consuming your GitHub Copilot quota, potentially causing **significant financial loss and account risk**.
 
 **Networking** (service → Settings tab → Networking):
 
