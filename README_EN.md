@@ -36,6 +36,12 @@ After the first deploy (it will show the Auth Wizard), configure these in Railwa
 
 - Set **Custom Dockerfile Path** to `railway/Dockerfile`
 
+**Disable Auto-deploy** (service → Settings tab → Source):
+
+- Find **Branch connected to production** and click **Disconnect**
+- This prevents code pushes from triggering redeployments (which would clear OAuth credentials)
+- To update manually: `Cmd+K` → "Deploy Latest Commit"
+
 ### 3. Authenticate with GitHub Copilot
 
 1. Open your Railway domain URL in a browser

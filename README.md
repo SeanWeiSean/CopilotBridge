@@ -36,6 +36,12 @@
 
 - 将 **Custom Dockerfile Path** 设置为 `railway/Dockerfile`
 
+**关闭自动部署**（服务 → Settings 标签 → Source）：
+
+- 找到 **Branch connected to production**，点击 **Disconnect**
+- 这样 push 代码不会触发自动重新部署（重新部署会导致 OAuth 凭据丢失）
+- 需要更新时，在 Railway 中手动触发：`Cmd+K` → "Deploy Latest Commit"
+
 ### 3. GitHub Copilot 认证
 
 1. 在浏览器中打开你的 Railway 域名 URL
