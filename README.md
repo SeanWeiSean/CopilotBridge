@@ -85,18 +85,21 @@ export ANTHROPIC_API_KEY="YOUR_MASTER_KEY"
 | **Google** | gemini-2.5-pro, gemini-3-flash-preview, gemini-3.1-pro-preview |
 | **其他** | minimax-m2.5 |
 
-### 重新认证
+### 关于 Token 刷新
 
-如果 GitHub OAuth 令牌过期，容器会自动崩溃并重启进入认证向导。再次访问 URL 完成认证即可。
+- **Copilot API 密钥**（每 ~30 分钟过期）：LiteLLM **自动刷新**，无需任何操作
+- **GitHub OAuth 令牌**：长期有效，除非你手动在 GitHub Settings 中撤销授权或组织策略变更
 
-手动触发重新认证：
+通常情况下你**不需要重新认证**。如果确实需要（例如更换 GitHub 账号），可以手动触发：
 
 ```bash
 curl -X POST https://your-app.up.railway.app/auth/reset \
   -H "Authorization: Bearer YOUR_MASTER_KEY"
 ```
 
-> **提示：** 挂载 [Railway Volume](https://docs.railway.com/guides/volumes)（路径 `/root/.config`）可以在重新部署后保留 OAuth 凭据。
+重置后容器会重启进入认证向导，访问 URL 完成新的 OAuth 即可。
+
+> **提示：** 挂载 [Railway Volume](https://docs.railway.com/guides/volumes)（路径 `/root/.config`）可以在重新部署后保留 OAuth 凭据，避免每次 redeploy 后重新认证。
 
 ---
 

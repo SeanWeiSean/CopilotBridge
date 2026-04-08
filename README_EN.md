@@ -85,16 +85,19 @@ export ANTHROPIC_API_KEY="YOUR_MASTER_KEY"
 | **Google** | gemini-2.5-pro, gemini-3-flash-preview, gemini-3.1-pro-preview |
 | **Other** | minimax-m2.5 |
 
-### Re-authentication
+### Token Refresh
 
-If the GitHub OAuth token expires, the container will crash and restart into the Auth Wizard automatically. Just visit the URL again and complete the flow.
+- **Copilot API key** (expires every ~30 min): LiteLLM **auto-refreshes** it — no action needed
+- **GitHub OAuth token**: Long-lived, only invalidated if you manually revoke it in GitHub Settings or org policy changes
 
-To manually trigger re-auth, call:
+You typically **never need to re-authenticate**. If you do (e.g. switching GitHub accounts), trigger it manually:
 
 ```bash
 curl -X POST https://your-app.up.railway.app/auth/reset \
   -H "Authorization: Bearer YOUR_MASTER_KEY"
 ```
+
+After reset, the container restarts into the Auth Wizard. Visit the URL to complete a new OAuth flow.
 
 > **Tip:** Attach a [Railway Volume](https://docs.railway.com/guides/volumes) mounted at `/root/.config` to persist OAuth credentials across redeploys.
 
