@@ -2,13 +2,81 @@
 
 [English](README_EN.md) | [日本語](README_JA.md) | [한국어](README_KO.md) | [Español](README_ES.md)
 
-一个共享的 LiteLLM 代理，让团队通过单一的 OpenAI 兼容 API 端点使用 GitHub Copilot 模型（Claude、GPT、Gemini）——无需每台机器单独安装 Docker 或浏览器认证。
+将 GitHub Copilot 的能力延伸到任何工具和场景——通过一个 OpenAI 兼容的 API 端点，让你在 Claude Code、Cursor、自定义脚本、CI/CD 等任何支持 OpenAI API 的地方使用 Copilot 模型（Claude、GPT、Gemini）。
 
-> **部署方式选择：**
-> - **Railway（快速体验）**：有免费试用额度（$5 credit），适合个人体验和测试，约可免费使用一个月。按下方指引操作即可。
-> - **Azure Container Apps（推荐生产环境）**：适合团队长期使用，参考 [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md)，配合 Claude Code 等 AI 工具可一步完成部署。
+## 为什么需要 CopilotBridge？
 
-## 一键部署到 Railway
+你已经有了 GitHub Copilot 订阅，但它的能力被锁在了 VS Code 和 GitHub 的界面里。CopilotBridge 让你：
+
+- 在 **Claude Code** 中使用 Copilot 的 Claude/GPT 模型
+- 在 **Cursor**、**Continue** 等第三方 IDE 插件中调用 Copilot 模型
+- 在 **自动化脚本和 CI/CD** 中集成 AI 能力
+- 在 **任何设备**上通过 API 访问，无需浏览器登录
+- 一次认证，**到处使用**
+
+## 部署方式
+
+| 方式 | 适合场景 | 成本 |
+|------|---------|------|
+| **🖥️ 本地运行** | 个人使用，最快上手 | 免费 |
+| **🚂 Railway** | 无需本地 Docker，随时随地访问 | 免费体验（$5 credit，约一个月）|
+| **☁️ Azure** | 长期稳定，企业级特性 | 按 Azure 计费 |
+
+---
+
+## 🖥️ 本地运行（最快上手）
+
+只需 Docker，3 步搞定：
+
+### 1. 启动本地代理
+
+```bash
+# 第一次运行会触发 GitHub OAuth 认证
+docker run -it --rm \
+    -p 4000:4000 \
+    -v litellm_config:/root/.config \
+    -v $(pwd)/litellm_config.yaml:/app/config.yaml:ro \
+    -e LITELLM_MASTER_KEY=sk-your-secret-key \
+    ghcr.io/berriai/litellm:main-latest \
+    --config /app/config.yaml --host 0.0.0.0 --port 4000
+```
+
+**Windows PowerShell：**
+```powershell
+$env:MSYS_NO_PATHCONV=1
+docker run -it --rm `
+    -p 4000:4000 `
+    -v "litellm_config:/root/.config" `
+    -v "${PWD}\litellm_config.yaml:/app/config.yaml:ro" `
+    -e LITELLM_MASTER_KEY=sk-your-secret-key `
+    ghcr.io/berriai/litellm:main-latest `
+    --config /app/config.yaml --host 0.0.0.0 --port 4000
+```
+
+### 2. 完成 GitHub 认证
+
+启动后终端会显示：
+```
+Please visit https://github.com/login/device and enter code XXXX-YYYY to authenticate.
+```
+打开链接，输入代码，授权即可。
+
+### 3. 使用
+
+```bash
+curl http://localhost:4000/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "Hello!"}]}'
+```
+
+> 认证信息保存在 Docker volume `litellm_config` 中，下次启动自动复用，无需重复认证。
+
+---
+
+## 🚂 Railway 部署（无需本地 Docker）
+
+Railway 有 **$5 免费额度**，供体验约一个月。无需安装任何本地工具。
 
 ### 1. Fork 并部署
 
@@ -16,71 +84,70 @@
 2. 打开 [railway.com](https://railway.com/)，使用 GitHub 账号登录
 3. 如果提示，点击 **Install Railway GitHub App** 授权访问你的仓库
 4. **New Project** → **Deploy from GitHub Repo** → 选择你 fork 的 `CopilotBridge` 仓库
-5. Railway 会自动开始构建
 
 ### 2. 配置
-
-首次部署完成后（会显示认证向导页面），在 Railway 中配置以下内容：
 
 **环境变量**（服务 → Variables 标签 → New Variable）：
 
 | 变量 | 值 |
 |---|---|
-| `LITELLM_MASTER_KEY` | 一个高强度密钥（至少 32 位随机字符）。可用密码生成器生成，例如：`sk-` + 随机 32 位十六进制字符串 |
+| `LITELLM_MASTER_KEY` | 一个高强度密钥（至少 32 位随机字符） |
 | `RAILWAY_RUN_UID` | `0` |
 
-生成密钥示例（在终端运行）：
+生成密钥：
 ```bash
-# Linux / macOS
 echo "sk-$(openssl rand -hex 16)"
-# PowerShell
-"sk-" + -join ((1..32) | ForEach-Object { '{0:x}' -f (Get-Random -Max 16) })
 ```
 
-> **🚨 强烈建议设置 `LITELLM_MASTER_KEY`！** 如果不设置此密钥，代理将完全开放——互联网上任何人都可以通过你的代理调用 AI 模型，消耗你的 GitHub Copilot 配额，可能导致**严重的资金损失和账号风险**。
+> **🚨 强烈建议设置 `LITELLM_MASTER_KEY`！** 不设则代理完全开放，互联网上任何人都可调用，可能导致**严重的资金损失和账号风险**。
 
-**网络配置**（服务 → Settings 标签 → Networking）：
+**网络配置**（服务 → Settings → Networking → **Generate Domain**）
 
-- 在 **Public Networking** 下，点击 **Generate Domain**
-- 你会得到一个类似 `https://your-app-production.up.railway.app` 的 URL
+**Dockerfile 路径**（服务 → Settings → Build → Custom Dockerfile Path → `railway/Dockerfile`）
 
-**Dockerfile 路径**（服务 → Settings 标签 → Build）：
-
-- 将 **Custom Dockerfile Path** 设置为 `railway/Dockerfile`
-
-**关闭自动部署**（服务 → Settings 标签 → Source）：
-
-- 找到 **Branch connected to production**，点击 **Disconnect**
-- 这样 push 代码不会触发自动重新部署（重新部署会导致 OAuth 凭据丢失）
-- 需要更新时，在 Railway 中手动触发：`Cmd+K` → "Deploy Latest Commit"
+**关闭自动部署**（服务 → Settings → Source → **Disconnect**）
+- 防止 push 代码时自动重新部署导致 OAuth 凭据丢失
+- 手动部署：`Cmd+K` → "Deploy Latest Commit"
 
 ### 3. GitHub Copilot 认证
 
-1. 在浏览器中打开你的 Railway 域名 URL
-2. 你会看到 **CopilotBridge 认证向导**
-3. 点击 **Begin Authentication**（开始认证）
-4. 页面显示设备代码 —— 点击 **Open GitHub** 并输入代码
-5. 在 GitHub 页面授权（约 10 秒）
-6. 代理自动重启进入 API 模式
+访问你的 Railway 域名 → 点击 **Begin Authentication** → 输入设备代码 → 授权（~10 秒）→ 代理自动进入 API 模式。
 
-### 4. 使用代理
+### 4. 使用
 
 ```bash
 curl https://your-app.up.railway.app/v1/chat/completions \
   -H "Authorization: Bearer YOUR_MASTER_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "你好！"}]}'
+  -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "Hello!"}]}'
 ```
 
-**Claude Code 用户配置：**
+---
 
+## ☁️ Azure 部署（推荐长期使用）
+
+Azure Container Apps 支持 Volume 持久化、VNet 网络隔离等企业级特性，适合长期稳定运行。
+
+使用 Claude Code 等 AI 工具配合 [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) 即可完成全部部署流程，也可参考 `scripts/` 目录中的自动化脚本。
+
+---
+
+## 客户端配置
+
+**Claude Code：**
 ```bash
-export ANTHROPIC_BASE_URL="https://your-app.up.railway.app"
+export ANTHROPIC_BASE_URL="https://your-proxy-url"
 export ANTHROPIC_AUTH_TOKEN="YOUR_MASTER_KEY"
 export ANTHROPIC_API_KEY="YOUR_MASTER_KEY"
 ```
 
-### 可用模型
+**OpenAI 兼容客户端（Cursor、Continue 等）：**
+```bash
+export OPENAI_API_BASE="https://your-proxy-url/v1"
+export OPENAI_API_KEY="YOUR_MASTER_KEY"
+```
+
+## 可用模型
 
 | 提供商 | 模型 |
 |--------|------|
@@ -89,40 +156,28 @@ export ANTHROPIC_API_KEY="YOUR_MASTER_KEY"
 | **Google** | gemini-2.5-pro, gemini-3-flash-preview, gemini-3.1-pro-preview |
 | **其他** | minimax-m2.5 |
 
-### 关于 Token 刷新
+## 关于 Token 刷新
 
-- **Copilot API 密钥**（每 ~30 分钟过期）：LiteLLM **自动刷新**，无需任何操作
-- **GitHub OAuth 令牌**：长期有效，除非你手动在 GitHub Settings 中撤销授权或组织策略变更
+- **Copilot API 密钥**（~30 分钟过期）：LiteLLM **自动刷新**，无需操作
+- **GitHub OAuth 令牌**：长期有效，除非手动撤销授权
 
-通常情况下你**不需要重新认证**。如果确实需要（例如更换 GitHub 账号），可以手动触发：
-
+通常**不需要重新认证**。如需手动触发：
 ```bash
-curl -X POST https://your-app.up.railway.app/auth/reset \
+curl -X POST https://your-proxy-url/auth/reset \
   -H "Authorization: Bearer YOUR_MASTER_KEY"
 ```
-
-重置后容器会重启进入认证向导，访问 URL 完成新的 OAuth 即可。
-
-> **提示：** 挂载 [Railway Volume](https://docs.railway.com/guides/volumes)（路径 `/root/.config`）可以在重新部署后保留 OAuth 凭据，避免每次 redeploy 后重新认证。
-
----
-
-## Azure 部署（推荐生产环境）
-
-Azure Container Apps 适合团队长期稳定使用，支持 Volume 持久化、VNet 网络隔离等企业级特性。使用 Claude Code 等 AI 工具配合 [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) 即可完成全部部署流程，也可参考 `scripts/` 目录中的自动化脚本。
 
 ## 架构
 
 ```
-用户 / CI/CD
+你的工具（Claude Code / Cursor / 脚本 / CI）
     │
     ▼
 ┌─────────────────────────┐
 │  CopilotBridge 代理     │
-│  (LiteLLM on Railway)   │
-│  LITELLM_MASTER_KEY     │
+│  本地 / Railway / Azure │
 └────────────┬────────────┘
-             │ GitHub OAuth 令牌
+             │ 自动管理的 OAuth
              ▼
 ┌─────────────────────────┐
 │  GitHub Copilot API     │
@@ -130,10 +185,17 @@ Azure Container Apps 适合团队长期稳定使用，支持 Volume 持久化、
 └─────────────────────────┘
 ```
 
-代理使用三层令牌机制：
-- **第一层** — GitHub OAuth 访问令牌（长期有效，通过设备代码流获取）
-- **第二层** — Copilot API 密钥（短期有效，LiteLLM 每 ~30 分钟自动刷新）
-- **第三层** — `LITELLM_MASTER_KEY`（代理访问密钥，分享给客户端使用）
+## Roadmap
+
+- [ ] Railway OAuth 凭据持久化（Volume 自动配置）
+- [ ] Railway 一键部署模板（Deploy Button）
+- [ ] 支持 AWS Bedrock 作为额外的模型后端
+- [ ] 支持 Google Cloud Vertex AI
+- [ ] 支持 Azure OpenAI Service
+- [ ] Web 管理面板增强（用量统计、模型切换）
+- [ ] 多用户 API Key 管理
+- [ ] Docker Compose 一键本地部署
+- [ ] 自动发现并更新可用模型列表
 
 ## 许可证
 

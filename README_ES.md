@@ -2,67 +2,79 @@
 
 [中文](README.md) | [English](README_EN.md) | [日本語](README_JA.md) | [한국어](README_KO.md)
 
-Un proxy compartido de LiteLLM que permite a tu equipo usar modelos de GitHub Copilot (Claude, GPT, Gemini) a través de un único endpoint API compatible con OpenAI — sin necesidad de Docker ni autenticación por navegador en cada máquina.
+Extiende el poder de GitHub Copilot a cualquier herramienta y flujo de trabajo. Usa los modelos de Copilot (Claude, GPT, Gemini) a través de un endpoint API compatible con OpenAI en Claude Code, Cursor, scripts personalizados, CI/CD y cualquier lugar que soporte la API de OpenAI.
 
-> **Opciones de despliegue:**
-> - **Railway (Inicio rápido)**: Crédito de prueba gratuito ($5), ideal para uso personal y pruebas. Aproximadamente 1 mes de uso gratuito. Sigue la guía a continuación.
-> - **Azure Container Apps (Recomendado para producción)**: Ideal para equipos y uso a largo plazo. Consulta [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) — puedes completar el despliegue con herramientas de IA como Claude Code.
+## ¿Por qué CopilotBridge?
 
-## Despliegue rápido en Railway
+Ya tienes una suscripción a GitHub Copilot, pero sus capacidades están encerradas en VS Code y la UI de GitHub. CopilotBridge te permite:
 
-### 1. Fork y despliegue
+- Usar los modelos Claude/GPT de Copilot en **Claude Code**
+- Llamar a modelos Copilot desde **Cursor**, **Continue** y otros plugins de IDE
+- Integrar IA en **scripts de automatización y CI/CD**
+- Acceder a los modelos vía API desde **cualquier dispositivo** — sin login por navegador
+- Autenticarte una vez, **usar en todas partes**
 
-1. Haz **Fork** de este repositorio en tu cuenta de GitHub
-2. Ve a [railway.com](https://railway.com/) e inicia sesión con tu cuenta de GitHub
-3. Si se solicita, **instala la Railway GitHub App** para otorgar acceso a tus repositorios
-4. **New Project** → **Deploy from GitHub Repo** → selecciona tu fork de `CopilotBridge`
-5. Railway comenzará a construir automáticamente
+## Opciones de Despliegue
 
-### 2. Configuración
+| Método | Ideal para | Costo |
+|--------|-----------|-------|
+| **🖥️ Local** | Uso personal, inicio más rápido | Gratis |
+| **🚂 Railway** | Sin Docker local, acceso desde cualquier lugar | Prueba gratis ($5 de crédito, ~1 mes) |
+| **☁️ Azure** | Estabilidad a largo plazo, funciones empresariales | Precios de Azure |
 
-Después del primer despliegue (se mostrará el asistente de autenticación), configura lo siguiente en Railway:
+---
 
-**Variables de entorno** (servicio → pestaña Variables → New Variable):
+## 🖥️ Ejecución Local (Inicio Más Rápido)
 
-| Variable | Valor |
-|---|---|
-| `LITELLM_MASTER_KEY` | Una clave secreta fuerte (al menos 32 caracteres aleatorios). Usa un generador de contraseñas. Ejemplo: `sk-` + 32 caracteres hexadecimales aleatorios |
-| `RAILWAY_RUN_UID` | `0` |
+Solo Docker, 3 pasos:
 
-> **🚨 ¡DEBES configurar `LITELLM_MASTER_KEY`!** Sin ella, el proxy queda completamente abierto — cualquier persona en Internet puede llamar a modelos de IA a través de tu proxy, lo que puede causar **pérdidas financieras graves y riesgo para tu cuenta**.
-
-**Red** (servicio → pestaña Settings → Networking):
-
-- En **Public Networking**, haz clic en **Generate Domain**
-
-**Ruta del Dockerfile** (servicio → pestaña Settings → Build):
-
-- Establece **Custom Dockerfile Path** como `railway/Dockerfile`
-
-**Desactivar auto-despliegue** (servicio → pestaña Settings → Source):
-
-- Encuentra **Branch connected to production** y haz clic en **Disconnect**
-- Esto evita que los push de código activen redespliegues automáticos (los redespliegues borran las credenciales OAuth)
-
-### 3. Autenticación con GitHub Copilot
-
-1. Abre la URL de tu dominio Railway en un navegador
-2. Verás el **asistente de autenticación CopilotBridge**
-3. Haz clic en **Begin Authentication**
-4. Aparecerá un código de dispositivo — haz clic en **Open GitHub** e ingresa el código
-5. Autoriza en GitHub (~10 segundos)
-6. El proxy se reinicia automáticamente en modo API
-
-### 4. Usa el proxy
+### 1. Iniciar el Proxy
 
 ```bash
-curl https://your-app.up.railway.app/v1/chat/completions \
-  -H "Authorization: Bearer YOUR_MASTER_KEY" \
+docker run -it --rm \
+    -p 4000:4000 \
+    -v litellm_config:/root/.config \
+    -v $(pwd)/litellm_config.yaml:/app/config.yaml:ro \
+    -e LITELLM_MASTER_KEY=sk-your-secret-key \
+    ghcr.io/berriai/litellm:main-latest \
+    --config /app/config.yaml --host 0.0.0.0 --port 4000
+```
+
+### 2. Autenticar con GitHub
+
+Ingresa el código de dispositivo mostrado en la terminal en tu navegador.
+
+### 3. Usar
+
+```bash
+curl http://localhost:4000/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-secret-key" \
   -H "Content-Type: application/json" \
   -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "¡Hola!"}]}'
 ```
 
-### Modelos disponibles
+---
+
+## 🚂 Despliegue en Railway (Sin Docker Local)
+
+Railway ofrece **$5 de crédito gratis** (~1 mes).
+
+1. Haz **Fork** de este repo → inicia sesión en [railway.com](https://railway.com/) con GitHub → **Deploy from GitHub Repo**
+2. Configura variables: `LITELLM_MASTER_KEY` (clave secreta fuerte), `RAILWAY_RUN_UID=0`
+3. Settings → Networking → **Generate Domain**
+4. Settings → Build → Custom Dockerfile Path → `railway/Dockerfile`
+5. Settings → Source → **Disconnect** (desactivar auto-despliegue)
+6. Abre la URL del dominio y completa el asistente de autenticación
+
+> **🚨 ¡DEBES configurar `LITELLM_MASTER_KEY`!** Sin ella, puede causar **pérdidas financieras graves y riesgo para tu cuenta**.
+
+---
+
+## ☁️ Despliegue en Azure (Recomendado para Uso a Largo Plazo)
+
+Consulta [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md). Puedes completar el despliegue con herramientas de IA como Claude Code.
+
+## Modelos Disponibles
 
 | Proveedor | Modelos |
 |-----------|---------|
@@ -71,11 +83,16 @@ curl https://your-app.up.railway.app/v1/chat/completions \
 | **Google** | gemini-2.5-pro, gemini-3-flash-preview, gemini-3.1-pro-preview |
 | **Otros** | minimax-m2.5 |
 
----
+## Roadmap
 
-## Despliegue en Azure
-
-Para el despliegue en Azure Container Apps, consulta [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) y el directorio `scripts/`.
+- [ ] Persistencia de credenciales OAuth en Railway (configuración automática de Volume)
+- [ ] Plantilla de despliegue con un clic para Railway
+- [ ] Soporte para AWS Bedrock como backend de modelos adicional
+- [ ] Soporte para Google Cloud Vertex AI
+- [ ] Soporte para Azure OpenAI Service
+- [ ] Panel de administración web mejorado (estadísticas de uso, cambio de modelos)
+- [ ] Gestión de claves API multi-usuario
+- [ ] Despliegue local con Docker Compose en un clic
 
 ## Licencia
 

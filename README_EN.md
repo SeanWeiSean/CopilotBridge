@@ -2,68 +2,98 @@
 
 [中文](README.md) | [日本語](README_JA.md) | [한국어](README_KO.md) | [Español](README_ES.md)
 
-A shared LiteLLM proxy that lets your team use GitHub Copilot models (Claude, GPT, Gemini) through a single OpenAI-compatible API endpoint — no per-machine Docker or browser auth needed.
+Extend GitHub Copilot's power to any tool and workflow — use Copilot models (Claude, GPT, Gemini) through a single OpenAI-compatible API endpoint in Claude Code, Cursor, custom scripts, CI/CD, and anywhere that supports the OpenAI API.
 
-> **Deployment options:**
-> - **Railway (Quick Start)**: Free trial credit ($5), good for personal use and testing (~1 month free). Follow the guide below.
-> - **Azure Container Apps (Recommended for Production)**: Best for teams and long-term use. See [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) — you can deploy it entirely with AI tools like Claude Code.
+## Why CopilotBridge?
 
-## Quick Deploy on Railway
+You already have a GitHub Copilot subscription, but its capabilities are locked inside VS Code and GitHub's UI. CopilotBridge lets you:
+
+- Use Copilot's Claude/GPT models in **Claude Code**
+- Call Copilot models from **Cursor**, **Continue**, and other IDE plugins
+- Integrate AI into **automation scripts and CI/CD**
+- Access models via API from **any device** — no browser login needed
+- Authenticate once, **use everywhere**
+
+## Deployment Options
+
+| Method | Best For | Cost |
+|--------|----------|------|
+| **🖥️ Local** | Personal use, quickest start | Free |
+| **🚂 Railway** | No local Docker, access anywhere | Free trial ($5 credit, ~1 month) |
+| **☁️ Azure** | Long-term stability, enterprise features | Azure pricing |
+
+---
+
+## 🖥️ Run Locally (Quickest Start)
+
+Just Docker, 3 steps:
+
+### 1. Start the Proxy
+
+```bash
+docker run -it --rm \
+    -p 4000:4000 \
+    -v litellm_config:/root/.config \
+    -v $(pwd)/litellm_config.yaml:/app/config.yaml:ro \
+    -e LITELLM_MASTER_KEY=sk-your-secret-key \
+    ghcr.io/berriai/litellm:main-latest \
+    --config /app/config.yaml --host 0.0.0.0 --port 4000
+```
+
+### 2. Authenticate with GitHub
+
+The terminal will display:
+```
+Please visit https://github.com/login/device and enter code XXXX-YYYY to authenticate.
+```
+Open the link, enter the code, authorize. Done.
+
+### 3. Use It
+
+```bash
+curl http://localhost:4000/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "Hello!"}]}'
+```
+
+> Credentials persist in Docker volume `litellm_config` — no re-auth on next start.
+
+---
+
+## 🚂 Railway Deployment (No Local Docker)
+
+Railway offers a **$5 free trial** (~1 month). No local tools needed.
 
 ### 1. Fork & Deploy
 
 1. **Fork** this repo to your GitHub account
-2. Go to [railway.com](https://railway.com/) and sign in with your GitHub account
-3. If prompted, **Install the Railway GitHub App** to grant access to your repos
-4. **New Project** → **Deploy from GitHub Repo** → select your forked `CopilotBridge` repo
-5. Railway will start building automatically
+2. Go to [railway.com](https://railway.com/) and sign in with GitHub
+3. If prompted, **Install the Railway GitHub App**
+4. **New Project** → **Deploy from GitHub Repo** → select `CopilotBridge`
 
 ### 2. Configure
 
-After the first deploy (it will show the Auth Wizard), configure these in Railway:
-
-**Variables** (service → Variables tab → New Variable):
+**Variables** (service → Variables → New Variable):
 
 | Variable | Value |
 |---|---|
-| `LITELLM_MASTER_KEY` | A strong secret key (at least 32 random characters). Use a password generator, e.g. `sk-` + 32 random hex characters |
+| `LITELLM_MASTER_KEY` | A strong key (32+ random chars): `echo "sk-$(openssl rand -hex 16)"` |
 | `RAILWAY_RUN_UID` | `0` |
 
-Generate a key (run in terminal):
-```bash
-# Linux / macOS
-echo "sk-$(openssl rand -hex 16)"
-# PowerShell
-"sk-" + -join ((1..32) | ForEach-Object { '{0:x}' -f (Get-Random -Max 16) })
-```
+> **🚨 You MUST set `LITELLM_MASTER_KEY`!** Without it, anyone can call AI models through your proxy — **significant financial loss and account risk**.
 
-> **🚨 You MUST set `LITELLM_MASTER_KEY`!** Without it, the proxy is completely open — anyone on the internet can call AI models through your proxy, consuming your GitHub Copilot quota, potentially causing **significant financial loss and account risk**.
+**Networking** (Settings → Networking → **Generate Domain**)
 
-**Networking** (service → Settings tab → Networking):
+**Dockerfile Path** (Settings → Build → `railway/Dockerfile`)
 
-- Under **Public Networking**, click **Generate Domain**
-- You'll get a URL like `https://your-app-production.up.railway.app`
+**Disable Auto-deploy** (Settings → Source → **Disconnect**)
 
-**Dockerfile Path** (service → Settings tab → Build):
+### 3. Authenticate
 
-- Set **Custom Dockerfile Path** to `railway/Dockerfile`
+Visit your Railway URL → **Begin Authentication** → enter device code → authorize (~10 sec) → proxy is live.
 
-**Disable Auto-deploy** (service → Settings tab → Source):
-
-- Find **Branch connected to production** and click **Disconnect**
-- This prevents code pushes from triggering redeployments (which would clear OAuth credentials)
-- To update manually: `Cmd+K` → "Deploy Latest Commit"
-
-### 3. Authenticate with GitHub Copilot
-
-1. Open your Railway domain URL in a browser
-2. You'll see the **CopilotBridge Auth Wizard**
-3. Click **Begin Authentication**
-4. A device code appears — click **Open GitHub** and enter the code
-5. Authorize in GitHub (takes ~10 seconds)
-6. The proxy automatically restarts into API mode
-
-### 4. Use the Proxy
+### 4. Use It
 
 ```bash
 curl https://your-app.up.railway.app/v1/chat/completions \
@@ -72,15 +102,32 @@ curl https://your-app.up.railway.app/v1/chat/completions \
   -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "Hello!"}]}'
 ```
 
-**For Claude Code users:**
+---
 
+## ☁️ Azure Deployment (Recommended for Long-term Use)
+
+Azure Container Apps offers Volume persistence, VNet isolation, and enterprise-grade features.
+
+Use AI tools like Claude Code with [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) to complete the entire deployment, or use the automation scripts in `scripts/`.
+
+---
+
+## Client Configuration
+
+**Claude Code:**
 ```bash
-export ANTHROPIC_BASE_URL="https://your-app.up.railway.app"
+export ANTHROPIC_BASE_URL="https://your-proxy-url"
 export ANTHROPIC_AUTH_TOKEN="YOUR_MASTER_KEY"
 export ANTHROPIC_API_KEY="YOUR_MASTER_KEY"
 ```
 
-### Available Models
+**OpenAI-compatible clients (Cursor, Continue, etc.):**
+```bash
+export OPENAI_API_BASE="https://your-proxy-url/v1"
+export OPENAI_API_KEY="YOUR_MASTER_KEY"
+```
+
+## Available Models
 
 | Provider | Models |
 |----------|--------|
@@ -89,51 +136,24 @@ export ANTHROPIC_API_KEY="YOUR_MASTER_KEY"
 | **Google** | gemini-2.5-pro, gemini-3-flash-preview, gemini-3.1-pro-preview |
 | **Other** | minimax-m2.5 |
 
-### Token Refresh
+## Token Refresh
 
-- **Copilot API key** (expires every ~30 min): LiteLLM **auto-refreshes** it — no action needed
-- **GitHub OAuth token**: Long-lived, only invalidated if you manually revoke it in GitHub Settings or org policy changes
+- **Copilot API key** (~30 min expiry): LiteLLM **auto-refreshes** — no action needed
+- **GitHub OAuth token**: Long-lived, only invalidated if you revoke it manually
 
-You typically **never need to re-authenticate**. If you do (e.g. switching GitHub accounts), trigger it manually:
+You typically **never need to re-authenticate**.
 
-```bash
-curl -X POST https://your-app.up.railway.app/auth/reset \
-  -H "Authorization: Bearer YOUR_MASTER_KEY"
-```
+## Roadmap
 
-After reset, the container restarts into the Auth Wizard. Visit the URL to complete a new OAuth flow.
-
-> **Tip:** Attach a [Railway Volume](https://docs.railway.com/guides/volumes) mounted at `/root/.config` to persist OAuth credentials across redeploys.
-
----
-
-## Azure Deployment (Recommended for Production)
-
-Azure Container Apps is ideal for teams needing long-term stability, with Volume persistence, VNet isolation, and enterprise-grade features. Use AI tools like Claude Code with [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) to complete the entire deployment, or use the automation scripts in `scripts/`.
-
-## Architecture
-
-```
-User / CI/CD
-    │
-    ▼
-┌─────────────────────────┐
-│  CopilotBridge Proxy    │
-│  (LiteLLM on Railway)   │
-│  LITELLM_MASTER_KEY     │
-└────────────┬────────────┘
-             │ GitHub OAuth token
-             ▼
-┌─────────────────────────┐
-│  GitHub Copilot API     │
-│  Claude, GPT, Gemini    │
-└─────────────────────────┘
-```
-
-The proxy uses a three-layer token system:
-- **Layer 1** — GitHub OAuth access token (long-lived, from Device Code Flow)
-- **Layer 2** — Copilot API key (short-lived, auto-refreshed by LiteLLM every ~30 min)
-- **Layer 3** — `LITELLM_MASTER_KEY` (your proxy access key, shared with clients)
+- [ ] Railway OAuth credential persistence (auto Volume setup)
+- [ ] Railway one-click deploy template (Deploy Button)
+- [ ] AWS Bedrock as additional model backend
+- [ ] Google Cloud Vertex AI support
+- [ ] Azure OpenAI Service support
+- [ ] Enhanced web admin panel (usage stats, model switching)
+- [ ] Multi-user API key management
+- [ ] Docker Compose one-click local deployment
+- [ ] Auto-discover and update available model list
 
 ## License
 

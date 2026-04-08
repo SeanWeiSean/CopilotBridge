@@ -2,67 +2,79 @@
 
 [中文](README.md) | [English](README_EN.md) | [한국어](README_KO.md) | [Español](README_ES.md)
 
-GitHub Copilot のモデル（Claude、GPT、Gemini）を、単一の OpenAI 互換 API エンドポイントでチーム共有できる LiteLLM プロキシです。各マシンでの Docker セットアップやブラウザ認証は不要です。
+GitHub Copilot の能力をあらゆるツールとワークフローに拡張します。OpenAI 互換 API エンドポイントを通じて、Claude Code、Cursor、カスタムスクリプト、CI/CD など、OpenAI API をサポートするあらゆる場所で Copilot モデル（Claude、GPT、Gemini）を利用できます。
 
-> **デプロイ方法の選択：**
-> - **Railway（お試し）**：無料トライアルクレジット（$5）があり、個人利用やテストに最適。約1ヶ月間無料で利用可能。以下のガイドに従ってください。
-> - **Azure Container Apps（本番環境推奨）**：チームでの長期利用に最適。[copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) を参照してください。Claude Code などの AI ツールでデプロイを完了できます。
+## なぜ CopilotBridge？
 
-## Railway へのクイックデプロイ
+GitHub Copilot のサブスクリプションはすでにお持ちですが、その能力は VS Code と GitHub の UI に閉じ込められています。CopilotBridge を使えば：
 
-### 1. Fork してデプロイ
+- **Claude Code** で Copilot の Claude/GPT モデルを使用
+- **Cursor**、**Continue** などのサードパーティ IDE プラグインから呼び出し
+- **自動化スクリプトや CI/CD** に AI 能力を統合
+- **どのデバイスからでも** API でアクセス（ブラウザログイン不要）
+- 一度認証すれば、**どこでも使える**
 
-1. このリポジトリを自分の GitHub アカウントに **Fork**
-2. [railway.com](https://railway.com/) を開き、GitHub アカウントでログイン
-3. プロンプトが表示されたら **Railway GitHub App をインストール** してリポジトリへのアクセスを許可
-4. **New Project** → **Deploy from GitHub Repo** → Fork した `CopilotBridge` を選択
-5. Railway が自動的にビルドを開始
+## デプロイ方法
 
-### 2. 設定
+| 方法 | 適した用途 | コスト |
+|------|-----------|--------|
+| **🖥️ ローカル** | 個人利用、最速スタート | 無料 |
+| **🚂 Railway** | ローカル Docker 不要、どこからでもアクセス | 無料体験（$5 クレジット、約1ヶ月）|
+| **☁️ Azure** | 長期安定運用、エンタープライズ機能 | Azure 料金 |
 
-初回デプロイ後（認証ウィザードが表示されます）、Railway で以下を設定：
+---
 
-**環境変数**（サービス → Variables タブ → New Variable）：
+## 🖥️ ローカル実行（最速スタート）
 
-| 変数 | 値 |
-|---|---|
-| `LITELLM_MASTER_KEY` | 高強度の秘密鍵（32文字以上のランダム文字列）。パスワード生成ツールで生成してください。例：`sk-` + ランダムな32桁の16進文字列 |
-| `RAILWAY_RUN_UID` | `0` |
+Docker さえあれば、3ステップで完了：
 
-> **🚨 `LITELLM_MASTER_KEY` は必ず設定してください！** 設定しない場合、プロキシは完全にオープンになり、インターネット上の誰でも AI モデルを呼び出せます。**深刻な金銭的損失やアカウントリスク**につながる可能性があります。
-
-**ネットワーク設定**（サービス → Settings タブ → Networking）：
-
-- **Public Networking** で **Generate Domain** をクリック
-
-**Dockerfile パス**（サービス → Settings タブ → Build）：
-
-- **Custom Dockerfile Path** を `railway/Dockerfile` に設定
-
-**自動デプロイの無効化**（サービス → Settings タブ → Source）：
-
-- **Branch connected to production** を見つけて **Disconnect** をクリック
-- コードの push による自動再デプロイを防止します（再デプロイすると OAuth 資格情報が失われます）
-
-### 3. GitHub Copilot 認証
-
-1. ブラウザで Railway のドメイン URL を開く
-2. **CopilotBridge 認証ウィザード** が表示される
-3. **Begin Authentication** をクリック
-4. デバイスコードが表示される → **Open GitHub** をクリックしてコードを入力
-5. GitHub で認証（約10秒）
-6. プロキシが自動的に再起動して API モードに移行
-
-### 4. プロキシの使用
+### 1. プロキシを起動
 
 ```bash
-curl https://your-app.up.railway.app/v1/chat/completions \
-  -H "Authorization: Bearer YOUR_MASTER_KEY" \
+docker run -it --rm \
+    -p 4000:4000 \
+    -v litellm_config:/root/.config \
+    -v $(pwd)/litellm_config.yaml:/app/config.yaml:ro \
+    -e LITELLM_MASTER_KEY=sk-your-secret-key \
+    ghcr.io/berriai/litellm:main-latest \
+    --config /app/config.yaml --host 0.0.0.0 --port 4000
+```
+
+### 2. GitHub 認証
+
+ターミナルに表示されるデバイスコードをブラウザで入力して認証。
+
+### 3. 使用開始
+
+```bash
+curl http://localhost:4000/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-secret-key" \
   -H "Content-Type: application/json" \
   -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "こんにちは！"}]}'
 ```
 
-### 利用可能なモデル
+---
+
+## 🚂 Railway デプロイ（ローカル Docker 不要）
+
+Railway には **$5 の無料クレジット**（約1ヶ月分）があります。
+
+1. このリポを **Fork** → [railway.com](https://railway.com/) で GitHub ログイン → **Deploy from GitHub Repo**
+2. 環境変数を設定：`LITELLM_MASTER_KEY`（強力な秘密鍵）、`RAILWAY_RUN_UID=0`
+3. Settings → Networking → **Generate Domain**
+4. Settings → Build → Custom Dockerfile Path → `railway/Dockerfile`
+5. Settings → Source → **Disconnect**（自動デプロイを無効化）
+6. ドメイン URL を開いて認証ウィザードを完了
+
+> **🚨 `LITELLM_MASTER_KEY` は必ず設定してください！** 未設定の場合、**深刻な金銭的損失とアカウントリスク**が発生する可能性があります。
+
+---
+
+## ☁️ Azure デプロイ（長期利用推奨）
+
+[copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) を参照。Claude Code 等の AI ツールでデプロイを完了できます。
+
+## 利用可能なモデル
 
 | プロバイダー | モデル |
 |-------------|--------|
@@ -71,11 +83,16 @@ curl https://your-app.up.railway.app/v1/chat/completions \
 | **Google** | gemini-2.5-pro, gemini-3-flash-preview, gemini-3.1-pro-preview |
 | **その他** | minimax-m2.5 |
 
----
+## Roadmap
 
-## Azure デプロイ
-
-Azure Container Apps へのデプロイについては、[copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) と `scripts/` ディレクトリを参照してください。
+- [ ] Railway OAuth 資格情報の永続化（Volume 自動設定）
+- [ ] Railway ワンクリックデプロイテンプレート
+- [ ] AWS Bedrock バックエンド対応
+- [ ] Google Cloud Vertex AI 対応
+- [ ] Azure OpenAI Service 対応
+- [ ] Web 管理パネル強化（使用量統計、モデル切替）
+- [ ] マルチユーザー API キー管理
+- [ ] Docker Compose ワンクリックローカルデプロイ
 
 ## ライセンス
 
