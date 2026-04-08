@@ -2,7 +2,17 @@
 
 [中文](README.md) | [English](README_EN.md) | [日本語](README_JA.md) | [한국어](README_KO.md)
 
-Extiende el poder de GitHub Copilot a cualquier herramienta y flujo de trabajo. Usa los modelos de Copilot (Claude, GPT, Gemini) a través de un endpoint API compatible con OpenAI en Claude Code, Cursor, scripts personalizados, CI/CD y cualquier lugar que soporte la API de OpenAI.
+Un proxy inverso de la API de GitHub Copilot, exponiéndola como un servicio compatible con OpenAI y Anthropic. Usa modelos de Copilot (Claude, GPT, Gemini) en Claude Code, Cursor, scripts, CI/CD y cualquier lugar que soporte la API de OpenAI.
+
+> [!WARNING]
+> Este es un proxy de ingeniería inversa de la API de GitHub Copilot. **No está soportado por GitHub** y puede dejar de funcionar inesperadamente. Úselo bajo su propio riesgo.
+
+> [!WARNING]
+> **Aviso de seguridad de GitHub:**
+> El uso excesivo automatizado de Copilot puede activar los [sistemas de detección de abuso](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies) de GitHub.
+> Políticas: [Políticas de uso aceptable](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies) · [Términos de GitHub Copilot](https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#github-copilot)
+>
+> **Use este proxy de manera responsable para evitar restricciones de cuenta.**
 
 ## ¿Por qué CopilotBridge?
 

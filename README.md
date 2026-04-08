@@ -2,7 +2,21 @@
 
 [English](README_EN.md) | [日本語](README_JA.md) | [한국어](README_KO.md) | [Español](README_ES.md)
 
-将 GitHub Copilot 的能力延伸到任何工具和场景——通过一个 OpenAI 兼容的 API 端点，让你在 Claude Code、Cursor、自定义脚本、CI/CD 等任何支持 OpenAI API 的地方使用 Copilot 模型（Claude、GPT、Gemini）。
+GitHub Copilot API 的逆向代理，将其暴露为 OpenAI 和 Anthropic 兼容的服务。让你在 Claude Code、Cursor、自定义脚本、CI/CD 等任何支持 OpenAI API 的地方使用 Copilot 模型（Claude、GPT、Gemini）。
+
+> [!WARNING]
+> 这是一个 GitHub Copilot API 的逆向代理。**它不受 GitHub 官方支持**，可能会意外失效。使用风险自负。
+
+> [!WARNING]
+> **GitHub 安全提示：**
+> 过度的自动化或脚本化使用 Copilot（包括通过自动化工具进行的快速或批量请求）可能会触发 GitHub 的[滥用检测系统](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies)。
+> 您可能会收到 GitHub 安全团队的警告，进一步的异常活动可能导致您的 Copilot 访问权限被暂时停用。
+>
+> GitHub 禁止使用其服务器进行过度的自动化批量活动或任何给其基础设施带来不当负担的活动。
+>
+> 相关政策：[GitHub 可接受使用政策](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies) · [GitHub Copilot 条款](https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#github-copilot)
+>
+> **请负责任地使用此代理，以避免账户受限。**
 
 ## 为什么需要 CopilotBridge？
 

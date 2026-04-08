@@ -2,7 +2,17 @@
 
 [中文](README.md) | [English](README_EN.md) | [日本語](README_JA.md) | [Español](README_ES.md)
 
-GitHub Copilot의 능력을 모든 도구와 워크플로우로 확장합니다. OpenAI 호환 API 엔드포인트를 통해 Claude Code, Cursor, 커스텀 스크립트, CI/CD 등 OpenAI API를 지원하는 모든 곳에서 Copilot 모델(Claude, GPT, Gemini)을 사용할 수 있습니다.
+GitHub Copilot API의 리버스 프록시. OpenAI 및 Anthropic 호환 서비스로 노출하여 Claude Code, Cursor, CI/CD 등에서 Copilot 모델(Claude, GPT, Gemini)을 사용할 수 있습니다.
+
+> [!WARNING]
+> 이것은 GitHub Copilot API의 리버스 엔지니어링 프록시입니다. **GitHub의 공식 지원을 받지 않으며**, 예고 없이 작동이 중단될 수 있습니다. 사용에 따른 위험은 본인에게 있습니다.
+
+> [!WARNING]
+> **GitHub 보안 경고:**
+> Copilot의 과도한 자동화 또는 스크립트 사용은 GitHub의 [남용 감지 시스템](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies)을 트리거할 수 있습니다.
+> 관련 정책: [GitHub 이용 약관](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies) · [GitHub Copilot 조건](https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#github-copilot)
+>
+> **계정 제한을 피하기 위해 책임감 있게 사용해 주세요.**
 
 ## 왜 CopilotBridge인가?
 

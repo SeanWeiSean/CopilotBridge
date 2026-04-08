@@ -2,7 +2,17 @@
 
 [中文](README.md) | [English](README_EN.md) | [한국어](README_KO.md) | [Español](README_ES.md)
 
-GitHub Copilot の能力をあらゆるツールとワークフローに拡張します。OpenAI 互換 API エンドポイントを通じて、Claude Code、Cursor、カスタムスクリプト、CI/CD など、OpenAI API をサポートするあらゆる場所で Copilot モデル（Claude、GPT、Gemini）を利用できます。
+GitHub Copilot API のリバースプロキシ。OpenAI および Anthropic 互換サービスとして公開し、Claude Code、Cursor、CI/CD などで Copilot モデル（Claude、GPT、Gemini）を利用できます。
+
+> [!WARNING]
+> これは GitHub Copilot API のリバースエンジニアリングプロキシです。**GitHub の公式サポートはありません**。予告なく動作しなくなる可能性があります。自己責任でご利用ください。
+
+> [!WARNING]
+> **GitHub セキュリティに関する注意：**
+> Copilot の過度な自動化またはスクリプト利用は、GitHub の[abused 検出システム](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies)をトリガーする可能性があります。
+> 関連ポリシー：[GitHub 利用規約](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies) · [GitHub Copilot 条項](https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#github-copilot)
+>
+> **アカウント制限を避けるため、責任を持ってご利用ください。**
 
 ## なぜ CopilotBridge？
 
