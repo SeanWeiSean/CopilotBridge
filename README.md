@@ -1,6 +1,6 @@
 # CopilotBridge
 
-[English](README_EN.md) | [日本語](README_JA.md) | [한국어](README_KO.md) | [Español](README_ES.md)
+[English](README_EN.md)
 
 GitHub Copilot API 的逆向代理，将其暴露为 OpenAI 和 Anthropic 兼容的服务。让你在 Claude Code、Cursor、自定义脚本、CI/CD 等任何支持 OpenAI API 的地方使用 Copilot 模型（Claude、GPT、Gemini）。
 

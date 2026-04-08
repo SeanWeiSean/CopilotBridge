@@ -1,6 +1,6 @@
 # CopilotBridge
 
-[中文](README.md) | [日本語](README_JA.md) | [한국어](README_KO.md) | [Español](README_ES.md)
+[中文](README.md)
 
 A reverse proxy for the GitHub Copilot API, exposing it as an OpenAI and Anthropic compatible service. Use Copilot models (Claude, GPT, Gemini) in Claude Code, Cursor, custom scripts, CI/CD, and anywhere that supports the OpenAI API.
 
