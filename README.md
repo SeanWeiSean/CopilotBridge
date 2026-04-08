@@ -1,8 +1,12 @@
 # CopilotBridge
 
-[English](README_EN.md)
+[English](README_EN.md) | [日本語](README_JA.md) | [한국어](README_KO.md) | [Español](README_ES.md)
 
 一个共享的 LiteLLM 代理，让团队通过单一的 OpenAI 兼容 API 端点使用 GitHub Copilot 模型（Claude、GPT、Gemini）——无需每台机器单独安装 Docker 或浏览器认证。
+
+> **部署方式选择：**
+> - **Railway（快速体验）**：有免费试用额度（$5 credit），适合个人体验和测试，约可免费使用一个月。按下方指引操作即可。
+> - **Azure Container Apps（推荐生产环境）**：适合团队长期使用，参考 [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md)，配合 Claude Code 等 AI 工具可一步完成部署。
 
 ## 一键部署到 Railway
 
@@ -103,9 +107,9 @@ curl -X POST https://your-app.up.railway.app/auth/reset \
 
 ---
 
-## Azure 部署
+## Azure 部署（推荐生产环境）
 
-如需部署到 Azure Container Apps，请参阅 [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) 和 `scripts/` 目录。
+Azure Container Apps 适合团队长期稳定使用，支持 Volume 持久化、VNet 网络隔离等企业级特性。使用 Claude Code 等 AI 工具配合 [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) 即可完成全部部署流程，也可参考 `scripts/` 目录中的自动化脚本。
 
 ## 架构
 

@@ -1,8 +1,12 @@
 # CopilotBridge
 
-[中文](README.md)
+[中文](README.md) | [日本語](README_JA.md) | [한국어](README_KO.md) | [Español](README_ES.md)
 
 A shared LiteLLM proxy that lets your team use GitHub Copilot models (Claude, GPT, Gemini) through a single OpenAI-compatible API endpoint — no per-machine Docker or browser auth needed.
+
+> **Deployment options:**
+> - **Railway (Quick Start)**: Free trial credit ($5), good for personal use and testing (~1 month free). Follow the guide below.
+> - **Azure Container Apps (Recommended for Production)**: Best for teams and long-term use. See [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) — you can deploy it entirely with AI tools like Claude Code.
 
 ## Quick Deploy on Railway
 
@@ -103,9 +107,9 @@ After reset, the container restarts into the Auth Wizard. Visit the URL to compl
 
 ---
 
-## Azure Deployment
+## Azure Deployment (Recommended for Production)
 
-For Azure Container Apps deployment, see [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) and the `scripts/` directory.
+Azure Container Apps is ideal for teams needing long-term stability, with Volume persistence, VNet isolation, and enterprise-grade features. Use AI tools like Claude Code with [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) to complete the entire deployment, or use the automation scripts in `scripts/`.
 
 ## Architecture
 
