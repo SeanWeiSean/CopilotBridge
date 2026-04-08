@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash:*)",
+      "Bash(az account:*)",
+      "Bash(source:*)",
+      "Bash(az group:*)",
+      "Bash(docker info:*)",
+      "Bash(docker pull:*)",
+      "Bash(MSYS_NO_PATHCONV=1 docker run:*)"
+    ]
+  }
+}

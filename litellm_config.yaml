@@ -1,0 +1,59 @@
+model_list:
+  # --- Anthropic Claude ---
+  - model_name: claude-sonnet-4.5
+    litellm_params:
+      model: github_copilot/claude-sonnet-4.5
+  - model_name: claude-sonnet-4.6
+    litellm_params:
+      model: github_copilot/claude-sonnet-4.6
+  - model_name: claude-opus-4.5
+    litellm_params:
+      model: github_copilot/claude-opus-4.5
+  - model_name: claude-opus-4.6
+    litellm_params:
+      model: github_copilot/claude-opus-4.6
+  - model_name: claude-opus-4.6-1m
+    litellm_params:
+      model: github_copilot/claude-opus-4.6-1m
+  - model_name: claude-haiku-4.5
+    litellm_params:
+      model: github_copilot/claude-haiku-4.5
+  - model_name: claude-sonnet-4
+    litellm_params:
+      model: github_copilot/claude-sonnet-4
+  # --- OpenAI GPT ---
+  - model_name: gpt-4o
+    litellm_params:
+      model: github_copilot/gpt-4o
+  - model_name: gpt-4.1
+    litellm_params:
+      model: github_copilot/gpt-4.1
+  - model_name: gpt-5-mini
+    litellm_params:
+      model: github_copilot/gpt-5-mini
+  - model_name: gpt-5.1
+    litellm_params:
+      model: github_copilot/gpt-5.1
+  - model_name: gpt-5.2
+    litellm_params:
+      model: github_copilot/gpt-5.2
+  - model_name: gpt-5.4
+    litellm_params:
+      model: github_copilot/gpt-5.4
+  # --- Google Gemini ---
+  - model_name: gemini-2.5-pro
+    litellm_params:
+      model: github_copilot/gemini-2.5-pro
+  - model_name: gemini-3-flash-preview
+    litellm_params:
+      model: github_copilot/gemini-3-flash-preview
+  - model_name: gemini-3.1-pro-preview
+    litellm_params:
+      model: github_copilot/gemini-3.1-pro-preview
+  # --- Other ---
+  - model_name: minimax-m2.5
+    litellm_params:
+      model: github_copilot/minimax-m2.5
+
+general_settings:
+  drop_params: true

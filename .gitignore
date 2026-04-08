@@ -1,0 +1,20 @@
+# Secrets and credentials
+config.env
+.litellm_api_key
+.pg_password
+.auth-export/
+.auth-extracted/
+
+# Azure deployment artifacts
+containerapp.yaml
+.containerapp-update.yaml
+.logs-temp.json
+
+# OS/editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Temp files
+.api-key-temp.json
