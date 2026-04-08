@@ -32,13 +32,51 @@ You already have a GitHub Copilot subscription, but its capabilities are locked 
 
 | Method | Best For | Cost |
 |--------|----------|------|
-| **🖥️ Local** | Personal use, quickest start | Free |
-| **🚂 Railway** | No local Docker, access anywhere | Free trial ($5 credit, ~1 month) |
+| **� Railway** | **Recommended! One-click deploy, no local setup** | Free trial ($5 credit, ~1 month) |
 | **☁️ Azure** | Long-term stability, enterprise features | Azure pricing |
+| **🖥️ Local** | Personal use, requires Docker | Free |
 
 ---
 
-## 🖥️ Run Locally (Quickest Start)
+## 🚂 Railway Deployment (Recommended, One-Click)
+
+No local tools needed — just click and go. Railway offers a **$5 free trial** (~1 month).
+
+### 1. One-Click Deploy
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/A1hy6O?referralCode=gCb16U)
+
+After clicking the button:
+1. Sign in to Railway with your GitHub account
+2. Confirm `LITELLM_MASTER_KEY` (a random key is auto-generated, or customize your own)
+3. Click **Deploy** and wait for it to finish (Volume, networking, etc. are pre-configured)
+
+> **Save your `LITELLM_MASTER_KEY`** — you'll need it for client configuration.
+
+### 2. Authenticate
+
+Once deployed, visit your Railway URL → **Begin Authentication** → enter device code → authorize (~10 sec) → proxy is live.
+
+### 3. Use It
+
+```bash
+curl https://your-app.up.railway.app/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_MASTER_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "Hello!"}]}'
+```
+
+---
+
+## ☁️ Azure Deployment (Recommended for Long-term Use)
+
+Azure Container Apps offers Volume persistence, VNet isolation, and enterprise-grade features.
+
+Use AI tools like Claude Code with [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) to complete the entire deployment, or use the automation scripts in `scripts/`.
+
+---
+
+## 🖥️ Run Locally
 
 Just Docker, 3 steps:
 
@@ -75,44 +113,6 @@ curl http://localhost:4000/v1/chat/completions \
 
 ---
 
-## 🚂 Railway Deployment (No Local Docker)
-
-Railway offers a **$5 free trial** (~1 month). No local tools needed.
-
-### 1. One-Click Deploy
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/A1hy6O?referralCode=gCb16U)
-
-After clicking the button:
-1. Sign in to Railway with your GitHub account
-2. Confirm `LITELLM_MASTER_KEY` (a random key is auto-generated, or customize your own)
-3. Click **Deploy** and wait for it to finish (Volume, networking, etc. are pre-configured)
-
-> **Save your `LITELLM_MASTER_KEY`** — you'll need it for client configuration.
-
-### 2. Authenticate
-
-Once deployed, visit your Railway URL → **Begin Authentication** → enter device code → authorize (~10 sec) → proxy is live.
-
-### 3. Use It
-
-```bash
-curl https://your-app.up.railway.app/v1/chat/completions \
-  -H "Authorization: Bearer YOUR_MASTER_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"model": "claude-sonnet-4", "messages": [{"role": "user", "content": "Hello!"}]}'
-```
-
----
-
-## ☁️ Azure Deployment (Recommended for Long-term Use)
-
-Azure Container Apps offers Volume persistence, VNet isolation, and enterprise-grade features.
-
-Use AI tools like Claude Code with [copilot-litellm-azure-deployment.md](copilot-litellm-azure-deployment.md) to complete the entire deployment, or use the automation scripts in `scripts/`.
-
----
-
 ## Client Configuration
 
 **Claude Code:**
@@ -146,8 +146,9 @@ You typically **never need to re-authenticate**.
 
 ## Roadmap
 
-- [ ] Railway OAuth credential persistence (auto Volume setup)
-- [ ] Railway one-click deploy template (Deploy Button)
+- [x] Railway OAuth credential persistence (auto Volume setup)
+- [x] Railway one-click deploy template (Deploy Button)
+- [ ] Validate token on startup, auto re-auth if expired
 - [ ] AWS Bedrock as additional model backend
 - [ ] Google Cloud Vertex AI support
 - [ ] Azure OpenAI Service support
