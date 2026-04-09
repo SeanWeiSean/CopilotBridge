@@ -7,8 +7,6 @@
   "deploy": {
     "restartPolicyType": "ALWAYS",
     "restartPolicyMaxRetries": 10,
-    "requiredMountPath": "/root/.config/litellm",
-    "healthcheckPath": "/health/readiness",
-    "healthcheckTimeout": 300
+    "requiredMountPath": "/root/.config/litellm"
   }
 }
