@@ -58,3 +58,4 @@ model_list:
 general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
   drop_params: true
+  allow_requests_on_db_unavailable: true
