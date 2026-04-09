@@ -18,3 +18,5 @@ Thumbs.db
 
 # Temp files
 .api-key-temp.json
+
+.claude/
