@@ -148,7 +148,7 @@ You typically **never need to re-authenticate**.
 
 - [x] Railway OAuth credential persistence (auto Volume setup)
 - [x] Railway one-click deploy template (Deploy Button)
-- [ ] Validate token on startup, auto re-auth if expired
+- [x] Validate token on startup with retry, auto re-auth if expired
 - [ ] AWS Bedrock as additional model backend
 - [ ] Google Cloud Vertex AI support
 - [ ] Azure OpenAI Service support

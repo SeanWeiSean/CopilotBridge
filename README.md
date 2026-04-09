@@ -183,7 +183,7 @@ curl -X POST https://your-proxy-url/auth/reset \
 
 - [x] Railway OAuth 凭据持久化（Volume 自动配置）
 - [x] Railway 一键部署模板（Deploy Button）
-- [ ] 启动时自动检测 Token 有效性，失效自动进入重新认证
+- [x] 启动时自动检测 Token 有效性，失效自动进入重新认证
 - [ ] 支持 AWS Bedrock 作为额外的模型后端
 - [ ] 支持 Google Cloud Vertex AI
 - [ ] 支持 Azure OpenAI Service
