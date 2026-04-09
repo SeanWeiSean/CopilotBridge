@@ -56,6 +56,4 @@ model_list:
       model: github_copilot/minimax-m2.5
 
 general_settings:
-  master_key: os.environ/LITELLM_MASTER_KEY
   drop_params: true
-  allow_requests_on_db_unavailable: true

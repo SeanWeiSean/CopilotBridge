@@ -1,4 +1,4 @@
-FROM ghcr.io/berriai/litellm:main-latest
+FROM ghcr.io/berriai/litellm:main-stable
 
 # Copy LiteLLM model config
 COPY litellm_config.yaml /app/config.yaml
