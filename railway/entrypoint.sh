@@ -14,22 +14,30 @@ fi
 # Mode switch: token exists and valid → LiteLLM proxy, otherwise → Auth Wizard
 if [ -f "$TOKEN_FILE" ] && [ -s "$TOKEN_FILE" ]; then
     echo "[entrypoint] Token found. Validating with GitHub Copilot API..."
-    TOKEN=$(cat "$TOKEN_FILE")
 
-    MAX_RETRIES=5
+    MAX_RETRIES=3
     RETRY=0
     HTTP_STATUS="000"
 
     while [ "$RETRY" -lt "$MAX_RETRIES" ]; do
         RETRY=$((RETRY + 1))
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            --connect-timeout 5 --max-time 10 \
-            -H "Authorization: token ${TOKEN}" \
-            -H "Accept: application/json" \
-            -H "Editor-Version: vscode/1.85.1" \
-            -H "Editor-Plugin-Version: copilot/1.155.0" \
-            -H "User-Agent: GithubCopilot/1.155.0" \
-            "https://api.github.com/copilot_internal/v2/token" 2>/dev/null || echo "000")
+        # Use Python httpx (available in litellm image) instead of curl
+        HTTP_STATUS=$(TOKEN_FILE="$TOKEN_FILE" python3 -c "
+import os, httpx
+try:
+    token = open(os.environ['TOKEN_FILE']).read().strip()
+    r = httpx.get('https://api.github.com/copilot_internal/v2/token',
+        headers={
+            'Authorization': 'token ' + token,
+            'Accept': 'application/json',
+            'Editor-Version': 'vscode/1.85.1',
+            'Editor-Plugin-Version': 'copilot/1.155.0',
+            'User-Agent': 'GithubCopilot/1.155.0',
+        }, timeout=10)
+    print(r.status_code)
+except Exception:
+    print('000')
+" 2>/dev/null || echo "000")
 
         if [ "$HTTP_STATUS" = "200" ]; then
             break
@@ -41,8 +49,8 @@ if [ -f "$TOKEN_FILE" ] && [ -s "$TOKEN_FILE" ]; then
             break
         fi
 
-        # Network or server error — retry with backoff
-        DELAY=$((RETRY * 2))
+        # Network error — retry with backoff
+        DELAY=$((RETRY * 3))
         echo "[entrypoint] Validation attempt $RETRY/$MAX_RETRIES failed (HTTP $HTTP_STATUS). Retrying in ${DELAY}s..."
         sleep "$DELAY"
     done
