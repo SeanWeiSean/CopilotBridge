@@ -9,6 +9,6 @@
     "restartPolicyMaxRetries": 10,
     "requiredMountPath": "/root/.config/litellm",
     "healthcheckPath": "/health/readiness",
-    "healthcheckTimeout": 10
+    "healthcheckTimeout": 300
   }
 }

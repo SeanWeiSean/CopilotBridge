@@ -68,6 +68,12 @@ async def health():
     return {"status": "setup_required"}
 
 
+@app.get("/health/readiness")
+async def health_readiness():
+    """Readiness endpoint (matches LiteLLM's) for Railway health checks."""
+    return {"status": "healthy"}
+
+
 @app.post("/auth/start")
 async def auth_start():
     """Initiate GitHub Device Code Flow."""
